@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <form action="">
+        <label for="autocomplete">Please enter your country</label>
+        <input type="text" id="country" name="country" placeholder="Type here">
+    </form>
+
+    <ul id="autocomplete-results"></ul>
+  </div>
+
+<script>
+  let targetInput = document.getElementById("country"),
+    results = document.getElementById("autocomplete-results"),
+    countryList = ["UK", "Japan", "USA", "Australia", "South Africa", "Canada", "Singapore", "China", "South Korea", "France", "Germany", "Italy", "Spain"],
+    matches = [],
+    resultsCursor = 0;
+
+  // Focus input
+  targetInput.focus();
+
+  // Add event listener for keydown
+  targetInput.addEventListener("keydown", (e) => {
+    if (event.key == "Enter") {
+      e.preventDefault();
+    }
+  });
+
+  // Add event listener for input keyup
+  targetInput.addEventListener("keyup", (e) => {
+    results.innerHTML = "";
+    matches = [];
+    toggleResults("hide");
+
+    if (e.target.value.length > 0) {
+      getMatches(e.target.value);
+
+      if (matches.length > 0) {
+        displayMatches(matches);
+      }
+    }
+
+    if (results.classList.contains("visible")) {
+      console.log(e.key);
+      switch(e.key) {
+        case "ArrowUp":
+          if (resultsCursor > 0) {
+            resultsCursor--;
+            moveCursor(resultsCursor);
+          }
+          break;
+        case "ArrowDown":
+          if (resultsCursor < matches.length - 1) {
+            resultsCursor++;
+            moveCursor(resultsCursor);
+          }
+          break;
+        case "Enter":
+          targetInput.value = results.children[resultsCursor].innerHTML;
+          toggleResults("hide");
+          resultsCursor = 0;
+          break;
+      }
+    }
+  });
+
+  // Define function for toggling results list
+  const toggleResults = (action) => {
+    if (action == "show") {
+      results.classList.add("visible");
+    } else if (action == "hide") {
+      results.classList.remove("visible");
+    }
+  }
+  
+  // Define function for getting matches
+  const getMatches = (inputText) => {
+    for (let i = 0; i < countryList.length; i++) {
+      if (countryList[i].toLowerCase().indexOf(inputText.toLowerCase()) != -1) {
+        matches.push(countryList[i]);
+      }
+    }
+  }
+
+  // Define function for displaying matches
+  const displayMatches = (matchList) => {
+    let j = 0;
+
+    while (j < matchList.length) {
+      results.innerHTML += `<li class="result">${matchList[j]}</li>`;
+      j++
+    }
+
+    // First child gets class of "highlighted"
+    moveCursor(resultsCursor);
+
+    toggleResults("show");
+  }
+
+  // Define function to highlight selected result in results list
+  const moveCursor = (pos) => {
+    for (let x = 0; x < results.children.length; x++) {
+      results.children[x].classList.remove("highlighted");
+    }
+
+    results.children[pos].classList.add("highlighted");
+  }
+</script>
+</body>
+</html>
